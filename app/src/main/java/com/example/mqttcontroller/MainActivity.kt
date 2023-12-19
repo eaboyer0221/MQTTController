@@ -15,11 +15,15 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 
 
 class MainActivity(
-    roleArn: String,
-    clientId: String,
-    brokerAddress: String,
-    sessionName: String,
+    roleArn: String = "roleArn",
+    clientId: String = "clientId",
+    brokerAddress: String = "brokerAddress",
+    sessionName: String = "sessionName",
 ) : AppCompatActivity() {
+
+    companion object {
+        val TAG: String = MainActivity::class.java.simpleName
+    }
 
     // Declare an MQTTAndroid client
     private lateinit var mqttAndroidClient: MqttAndroidClient
@@ -49,19 +53,22 @@ class MainActivity(
                 roleArn,
                 sessionName,
             )
+
+            val options = MqttConnectOptions()
+            options.userName = provider.credentials.awsAccessKeyId
+            options.password = provider.credentials.awsSecretKey.toCharArray()
+
             MqttAndroidClient(
                 applicationContext,
                 serverUri,
                 clientId
             )
         } catch (e: Exception) {
+            Log.e(TAG, "NOOOOOO $e")
             null
         }!!
-        val options = MqttConnectOptions()
 
-        val token = mqttAndroidClient.connect(
-            options
-        )
+        val token = mqttAndroidClient.connect()
         token?.actionCallback = object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken) {
                 Log.i("Connection", "success ")
@@ -86,7 +93,7 @@ class MainActivity(
     fun subscribe(topic: String) {
         val qos = 2 // Mention your qos value
         try {
-            mqttAndroidClient?.subscribe(topic, qos, null, object : IMqttActionListener {
+            mqttAndroidClient.subscribe(topic, qos, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
                     // Give your callback on Subscription here
                 }
@@ -104,7 +111,7 @@ class MainActivity(
 
         fun unSubscribe(topic: String) {
             try {
-                val unsubToken = mqttAndroidClient?.unsubscribe(topic)
+                val unsubToken = mqttAndroidClient.unsubscribe(topic)
                 unsubToken?.actionCallback = object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken) {
                         // Give your callback on unsubscribing here
@@ -120,7 +127,7 @@ class MainActivity(
         }
 
         fun receiveMessages() {
-            mqttAndroidClient?.setCallback(object : MqttCallback {
+            mqttAndroidClient.setCallback(object : MqttCallback {
                 override fun connectionLost(cause: Throwable) {
                     //connectionStatus = false
                     // Give your callback on failure here
@@ -149,7 +156,7 @@ class MainActivity(
                 val message = MqttMessage(encodedPayload)
                 message.qos = 2
                 message.isRetained = false
-                mqttAndroidClient?.publish(topic, message)
+                mqttAndroidClient.publish(topic, message)
             } catch (e: Exception) {
                 // Give Callback on error here
             } catch (e: MqttException) {
@@ -159,7 +166,7 @@ class MainActivity(
 
         fun disconnect() {
             try {
-                val disconToken = mqttAndroidClient?.disconnect()
+                val disconToken = mqttAndroidClient.disconnect()
                 disconToken?.actionCallback = object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken) {
                         //connectionStatus = false

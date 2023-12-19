@@ -10,7 +10,7 @@ abstract class BaseHandler : RemoteProcedureCall {
         val identifier = message.payload.toString().split("-").first()
 
         // Process the request data based on the topic (e.g., sayHello)
-        val response = getProcedure()(identifier, message)
+        val response = getMessageProcessingProcedure()(identifier, message)
 
         // If temporary mapping is used, store the pending response
         val pendingResponses = mutableMapOf<String, String>()
@@ -30,5 +30,9 @@ abstract class BaseHandler : RemoteProcedureCall {
     abstract fun procedureName(): String
     fun getTopicFilter(): String = "${procedureName()}/request"
     abstract fun getMessageProcessingProcedure():  (String, MqttMessage) -> String
+
+    override fun getResponseTopic(topicName: String): String {
+        TODO("Not yet implemented")
+    }
 }
 
