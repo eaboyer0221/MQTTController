@@ -29,5 +29,6 @@ abstract class BaseHandler : RemoteProcedureCall {
 
     abstract fun procedureName(): String
     fun getTopicFilter(): String = "${procedureName()}/request"
+    abstract fun getMessageProcessingProcedure():  (String, MqttMessage) -> String
 }
 

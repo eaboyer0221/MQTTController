@@ -7,7 +7,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 interface RemoteProcedureCall {
     fun handle(message: MqttMessage, client: IMqttClient)
 
-    fun getProcedure() : (topicFilter: String, message: MqttMessage) -> String
+    fun getResponseTopic(topicName: String): String
 
     companion object {
         fun logTopicInfo(topicFilter: String) {
