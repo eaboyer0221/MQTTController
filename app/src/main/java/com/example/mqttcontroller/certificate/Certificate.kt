@@ -4,6 +4,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.SecurityConstants
 import java.io.FileInputStream
 import java.security.KeyStore
+import java.security.PrivateKey
 import java.security.cert.CertificateFactory
 
 class Certificate {
@@ -30,11 +31,12 @@ class Certificate {
 // Import root CA certificate
         keyStore.setCertificateEntry("caCert", CertificateFactory.getInstance("X.509").generateCertificate(caCertInputStream))
 
+        keyStore.setKeyEntry("clientCert", object : Key {})
 // Import client certificate and private key
         keyStore.setKeyEntry("clientCert",
             KeyStore.PrivateKeyEntry(
-                PrivateKeyFactory.getInstance("RSA").generatePrivate(privateKeyInputStream),
-                arrayOf(keyStore.getCertificate("caCert"))
+//                PrivateKeyFactory.getInstance("RSA").generatePrivate(privateKeyInputStream),
+//                arrayOf(keyStore.getCertificate("caCert"))
             )
         )
         val options = MqttConnectOptions()

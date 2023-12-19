@@ -1,5 +1,6 @@
 package com.example.mqttcontroller.handlers.sayhello
 
+import android.util.Log
 import com.example.mqttcontroller.RemoteProcedureCall.Companion.logTopicInfo
 import com.example.mqttcontroller.handlers.BaseHandler
 import com.google.gson.Gson
@@ -9,16 +10,18 @@ class SayHelloHandler: BaseHandler() {
     class MySayHelloRequest(val name: String)
     class SayHelloResponse(val greeting: String)
 
-
     override fun procedureName() = "${SayHelloHandler::class.java}"
-    override fun getProcedure(): (String, MqttMessage) -> String = processMessage
+    override fun getMessageProcessingProcedure() = messageProcessingProcedure
+    override fun getResponseTopic(topicName: String): String
+    = topicName.replace("request", "response")
+
     companion object {
-        val processMessage = fun(topicFilter: String, data: MqttMessage): String {
+        private val TAG: String = Companion::class.java.simpleName.replace("Companion", "")
+        val messageProcessingProcedure = fun(topicFilter: String, data: MqttMessage): String {
             logTopicInfo(topicFilter)
             val request = Gson().fromJson("${data.payload}", MySayHelloRequest::class.java)
-            // do we need this part?
             val message = "Hello ${request.name}"
-            println(message)
+            Log.d(TAG, message)
             return Gson().toJson(SayHelloResponse(message))
         }
     }

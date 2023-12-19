@@ -15,20 +15,26 @@ class MQTTControllerService : Service() {
 
     // Define a temporary map to store pending responses (optional)
     val client = MqttAsyncClient(brokerUrl, clientId)
-    var procedures: List<(topicFilter: String, message: MqttMessage) -> String>? = null
+
+    // Define a map of handler to function that should be run for each remote procedure call
+    private val procedures: Map<String, (String, MqttMessage) -> String> =  listOf(
+        SayHelloHandler(),
+        SayGoodbyeHandler()
+    ).map {
+        // Subscribe to the topic filter associated with each handler
+        client.subscribe(it.getTopicFilter(), 0) { topicFilter, message ->
+            // Use the handler to run the procedure & get the response any time a message comes in
+            val responseMessage = it.getMessageProcessingProcedure()(topicFilter, message)
+            val responseTopic = it.getResponseTopic(it.procedureName())
+            client.publish(responseTopic, responseMessage.toByteArray(), 0, false)
+        }
+        // make a map with class as key and procedure to run as value
+        it.getMessageProcessingProcedure()
+    }.associateBy { "${it.javaClass}" }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     init {
-        procedures = listOf(
-            SayHelloHandler(),
-            SayGoodbyeHandler()
-        ).map {
-            client.subscribe(it.getTopicFilter(), 0) { topicFilter, message ->
-                SayHelloHandler.processMessage(topicFilter, message)
-            }
-            it.getProcedure()
-        }
         val options = MqttConnectOptions()
         options.isCleanSession = true
 
@@ -41,10 +47,6 @@ class MQTTControllerService : Service() {
             options.keepAliveInterval = 20
             options.maxReconnectDelay = 25
         }
-
         client.connect()
     }
 }
-
-
-

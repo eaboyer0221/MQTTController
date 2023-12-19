@@ -12,6 +12,8 @@ class SayGoodbyeHandler : BaseHandler() {
 
 
     override fun procedureName() = "${SayGoodbyeHandler::class.java}"
+    override fun getMessageProcessingProcedure() = processMessage
+
     override fun getProcedure(): (String, MqttMessage) -> String = processMessage
     companion object {
         val processMessage = fun(topicFilter: String, data: MqttMessage): String {
