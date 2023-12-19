@@ -3,6 +3,7 @@ package com.example.mqttcontroller.broadcast
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 
 class MessageReceiver(intentName: String) : BroadcastReceiver() {
 
@@ -24,7 +25,8 @@ class MessageReceiver(intentName: String) : BroadcastReceiver() {
         if (intent.action == responseIntent) {
             intent.getStringExtra(MESSAGE_KEY)?.fromJson()
             // Do any other processing with the message here
-            receiverHandler.handle()
+//            receiverHandler.handle()
+            Log.i("TAG", "")
         }
     }
 }

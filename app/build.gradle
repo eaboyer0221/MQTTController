@@ -55,7 +55,4 @@ dependencies {
     /// https://mvnrepository.com/artifact/com.amazonaws/aws-android-sdk-iot
     implementation 'com.amazonaws:aws-android-sdk-iot:2.73.0'
     implementation 'com.amazonaws:aws-android-sdk-core:2.73.0'
-    implementation 'com.amazonaws:aws-android-sdk-sts:2.23.0'
-    // https://mvnrepository.com/artifact/com.amazonaws.auth/aws-java-sdk
-    implementation 'com.amazonaws.auth:aws-java-sdk:1.11.434'
 }
